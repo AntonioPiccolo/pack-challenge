@@ -2,7 +2,7 @@
 
 Backend API for managing file uploads and providing data.
 
-## 🚀 Requirements (Optional)
+## 🚀 Requirements
 
 - ✅ Backend APIs
 - ✅ Database
