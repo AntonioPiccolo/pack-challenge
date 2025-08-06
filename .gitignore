@@ -1,0 +1,6 @@
+node_modules
+.env
+cdk.out
+infrastructure/cdk.context.json
+infrastructure/cdk.out
+infrastructure/node_modules

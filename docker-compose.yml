@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://pack_user:pack_password@db:5432/pack_challenge
+      - S3_BUCKET_NAME=pack-challenge-files-129192343513
+    depends_on:
+      - db
+    restart: unless-stopped
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-south-1
+        awslogs-group: pack-challenge-app
+        awslogs-create-group: "true"
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=pack_challenge
+      - POSTGRES_USER=pack_user
+      - POSTGRES_PASSWORD=pack_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-south-1
+        awslogs-group: pack-challenge-db
+        awslogs-create-group: "true"
+
+volumes:
+  postgres_data:

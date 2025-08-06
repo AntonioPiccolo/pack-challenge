@@ -1,0 +1,29 @@
+{
+  "name": "pack-challenge",
+  "version": "1.0.0",
+  "description": "Backend API for managing file uploads and providing data for a dashboard",
+  "main": "./app/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "docker-compose -f docker-compose.local.yml up -d --build",
+    "stop": "docker-compose -f docker-compose.local.yml down -v"
+  },
+  "author": "Antonio Piccolo",
+  "license": "ISC",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.859.0",
+    "@aws-sdk/lib-storage": "^3.859.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "kysely": "^0.28.4",
+    "multer": "^2.0.2",
+    "pg": "^8.16.3",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.0.14"
+  }
+}

@@ -1,0 +1,579 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Pack Challenge API",
+    "version": "1.0.0",
+    "description": "Resource management system API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Resource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Resource unique identifier"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Resource title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Resource description"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["tutorial", "documentation", "template", "example", "guide"],
+            "nullable": true,
+            "description": "Resource category"
+          },
+          "language": {
+            "type": "string",
+            "enum": ["javascript", "python", "java", "csharp", "go", "rust", "typescript"],
+            "nullable": true,
+            "description": "Resource language"
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["aws", "azure", "gcp", "docker", "kubernetes"],
+            "nullable": true,
+            "description": "Resource provider"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["developer", "devops", "architect", "qa", "manager"],
+            "nullable": true,
+            "description": "Associated role"
+          },
+          "file_name": {
+            "type": "string",
+            "description": "Original file name"
+          },
+          "file_path": {
+            "type": "string",
+            "description": "S3 file URL"
+          },
+          "s3_key": {
+            "type": "string",
+            "description": "S3 object key"
+          },
+          "s3_bucket": {
+            "type": "string",
+            "description": "S3 bucket name"
+          },
+          "file_size": {
+            "type": "integer",
+            "description": "File size in bytes"
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "File MIME type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "ResourceSummary": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Request success status"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total_resources": {
+                "type": "string",
+                "description": "Total number of resources"
+              },
+              "total_size": {
+                "type": "string", 
+                "description": "Total size of all files in bytes"
+              },
+              "categories_breakdown": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Category name or null for uncategorized"
+                    },
+                    "count": {
+                      "type": "string",
+                      "description": "Number of resources in this category"
+                    }
+                  }
+                },
+                "description": "Count of resources per category"
+              },
+              "languages_breakdown": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "language": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Language name or null for unspecified"
+                    },
+                    "count": {
+                      "type": "string",
+                      "description": "Number of resources for this language"
+                    }
+                  }
+                },
+                "description": "Count of resources per language"
+              },
+              "providers_breakdown": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Provider name or null for unspecified"
+                    },
+                    "count": {
+                      "type": "string",
+                      "description": "Number of resources for this provider"
+                    }
+                  }
+                },
+                "description": "Count of resources per provider"
+              },
+              "roles_breakdown": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Role name or null for unspecified"
+                    },
+                    "count": {
+                      "type": "string",
+                      "description": "Number of resources for this role"
+                    }
+                  }
+                },
+                "description": "Count of resources per role"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/resources": {
+      "get": {
+        "summary": "Get all resources",
+        "description": "Retrieve a list of all resources with their metadata",
+        "tags": ["Resources"],
+        "responses": {
+          "200": {
+            "description": "List of resources retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Resource"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new resource",
+        "description": "Create a new resource with metadata",
+        "tags": ["Resources"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "file", "description", "category", "language", "provider", "role"],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "description": "Resource title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "description": "Resource description"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": ["tutorial", "documentation", "template", "example", "guide"],
+                    "description": "Resource category"
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": ["javascript", "python", "java", "csharp", "go", "rust", "typescript"],
+                    "description": "Resource language"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": ["aws", "azure", "gcp", "docker", "kubernetes"],
+                    "description": "Resource provider"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["developer", "devops", "architect", "qa", "manager"],
+                    "description": "Associated role"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resource created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Resource uploaded successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No file uploaded"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resources/{id}": {
+      "get": {
+        "summary": "Get a specific resource",
+        "description": "Retrieve a specific resource by its ID",
+        "tags": ["Resources"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Resource ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File downloaded successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "The MIME type of the file",
+                "schema": {
+                  "type": "string",
+                  "example": "application/pdf"
+                }
+              },
+              "Content-Length": {
+                "description": "Size of the file in bytes",
+                "schema": {
+                  "type": "integer",
+                  "example": 1024000
+                }
+              },
+              "Content-Disposition": {
+                "description": "Attachment header with filename",
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"document.pdf\""
+                }
+              },
+              "Last-Modified": {
+                "description": "Last modification date",
+                "schema": {
+                  "type": "string",
+                  "example": "Wed, 21 Oct 2015 07:28:00 GMT"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Resource not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resources/summary": {
+      "get": {
+        "summary": "Get resources summary",
+        "description": "Retrieve aggregated statistics about resources",
+        "tags": ["Resources"],
+        "responses": {
+          "200": {
+            "description": "Summary retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceSummary"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "total_resources": "15",
+                    "total_size": "52428800",
+                    "categories_breakdown": [
+                      {
+                        "category": "tutorial",
+                        "count": "5"
+                      },
+                      {
+                        "category": "documentation", 
+                        "count": "3"
+                      },
+                      {
+                        "category": "template",
+                        "count": "2"
+                      },
+                      {
+                        "category": null,
+                        "count": "5"
+                      }
+                    ],
+                    "languages_breakdown": [
+                      {
+                        "language": "javascript",
+                        "count": "6"
+                      },
+                      {
+                        "language": "python",
+                        "count": "4"
+                      },
+                      {
+                        "language": "java",
+                        "count": "2"
+                      },
+                      {
+                        "language": null,
+                        "count": "3"
+                      }
+                    ],
+                    "providers_breakdown": [
+                      {
+                        "provider": "aws",
+                        "count": "8"
+                      },
+                      {
+                        "provider": "azure",
+                        "count": "3"
+                      },
+                      {
+                        "provider": "docker",
+                        "count": "2"
+                      },
+                      {
+                        "provider": null,
+                        "count": "2"
+                      }
+                    ],
+                    "roles_breakdown": [
+                      {
+                        "role": "developer",
+                        "count": "7"
+                      },
+                      {
+                        "role": "devops",
+                        "count": "4"
+                      },
+                      {
+                        "role": "architect",
+                        "count": "2"
+                      },
+                      {
+                        "role": null,
+                        "count": "2"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

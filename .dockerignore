@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+README.md
+.env
+.env.local
+coverage
+.nyc_output
+.DS_Store
+infrastructure/
+docker-compose.yml
+Dockerfile
