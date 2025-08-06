@@ -46,7 +46,7 @@ Backend API for managing file uploads and providing data.
 
 ## 📊 Describe any scaling or multi-tenant considerations
 
-Currently we have a single shared database with no tenant isolation, single S3 prefix and a single EC2 for container managment. 
+Currently we have a single shared database with no tenant isolation and single S3 prefix. 
 
 Changes that I suggest for scaling or multi-tenant improvement:
   - Add tenant_id column to resources table, consider use data partitioning by tenant or separeted schemas
