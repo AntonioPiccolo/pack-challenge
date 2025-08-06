@@ -1,9 +1,7 @@
 const multer = require('multer');
 
-// Configure multer to use memory storage for S3 upload
 const storage = multer.memoryStorage();
 
-// File filter to allow common file types
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     'application/pdf',

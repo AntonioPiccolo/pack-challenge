@@ -1,7 +1,6 @@
 const validateWithZod = (schema) => {
   return (req, res, next) => {
     try {
-      // For multipart/form-data, use req.body (processed by multer)
       const validatedData = schema.parse(req.body)
       req.validatedData = validatedData
       next()

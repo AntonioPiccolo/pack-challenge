@@ -1,9 +1,9 @@
 const { z } = require('zod')
 
 const validCategories = ['tutorial', 'documentation', 'template', 'example', 'guide']
-const validLanguages = ['javascript', 'python', 'java', 'csharp', 'go', 'rust', 'typescript']
-const validProviders = ['aws', 'azure', 'gcp', 'docker', 'kubernetes']
-const validRoles = ['developer', 'devops', 'architect', 'qa', 'manager']
+const validLanguages = ['english', 'italian', 'spanish', 'french', 'german', 'portuguese', 'dutch', 'chinese', 'japanese', 'korean']
+const validProviders = ['pack', 'google', 'aws', 'amazon']
+const validRoles = ['Mentor / Coach', 'Mentee / Coachee']
 
 const uploadResourceSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must not exceed 200 characters').trim(),

@@ -12,6 +12,14 @@
     }
   ],
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for authentication. Use: pack-challenge-api-key"
+      }
+    },
     "schemas": {
       "Resource": {
         "type": "object",
@@ -38,19 +46,19 @@
           },
           "language": {
             "type": "string",
-            "enum": ["javascript", "python", "java", "csharp", "go", "rust", "typescript"],
+            "enum": ["english", "italian", "spanish", "french", "german", "portuguese", "dutch", "chinese", "japanese", "korean"],
             "nullable": true,
             "description": "Resource language"
           },
           "provider": {
             "type": "string",
-            "enum": ["aws", "azure", "gcp", "docker", "kubernetes"],
+            "enum": ["pack", "google", "aws", "amazon"],
             "nullable": true,
             "description": "Resource provider"
           },
           "role": {
             "type": "string",
-            "enum": ["developer", "devops", "architect", "qa", "manager"],
+            "enum": ["Mentor / Coach", "Mentee / Coachee"],
             "nullable": true,
             "description": "Associated role"
           },
@@ -192,6 +200,7 @@
         "summary": "Get all resources",
         "description": "Retrieve a list of all resources with their metadata",
         "tags": ["Resources"],
+        "security": [{"ApiKeyAuth": []}],
         "responses": {
           "200": {
             "description": "List of resources retrieved successfully",
@@ -241,6 +250,7 @@
         "summary": "Create a new resource",
         "description": "Create a new resource with metadata",
         "tags": ["Resources"],
+        "security": [{"ApiKeyAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
@@ -266,17 +276,17 @@
                   },
                   "language": {
                     "type": "string",
-                    "enum": ["javascript", "python", "java", "csharp", "go", "rust", "typescript"],
+                    "enum": ["english", "italian", "spanish", "french", "german", "portuguese", "dutch", "chinese", "japanese", "korean"],
                     "description": "Resource language"
                   },
                   "provider": {
                     "type": "string",
-                    "enum": ["aws", "azure", "gcp", "docker", "kubernetes"],
+                    "enum": ["pack", "google", "aws", "amazon"],
                     "description": "Resource provider"
                   },
                   "role": {
                     "type": "string",
-                    "enum": ["developer", "devops", "architect", "qa", "manager"],
+                    "enum": ["Mentor / Coach", "Mentee / Coachee"],
                     "description": "Associated role"
                   },
                   "file": {
@@ -361,6 +371,7 @@
         "summary": "Get a specific resource",
         "description": "Retrieve a specific resource by its ID",
         "tags": ["Resources"],
+        "security": [{"ApiKeyAuth": []}],
         "parameters": [
           {
             "in": "path",
@@ -462,6 +473,7 @@
         "summary": "Get resources summary",
         "description": "Retrieve aggregated statistics about resources",
         "tags": ["Resources"],
+        "security": [{"ApiKeyAuth": []}],
         "responses": {
           "200": {
             "description": "Summary retrieved successfully",
@@ -495,15 +507,15 @@
                     ],
                     "languages_breakdown": [
                       {
-                        "language": "javascript",
+                        "language": "english",
                         "count": "6"
                       },
                       {
-                        "language": "python",
+                        "language": "italian",
                         "count": "4"
                       },
                       {
-                        "language": "java",
+                        "language": "spanish",
                         "count": "2"
                       },
                       {
@@ -513,15 +525,15 @@
                     ],
                     "providers_breakdown": [
                       {
-                        "provider": "aws",
+                        "provider": "pack",
                         "count": "8"
                       },
                       {
-                        "provider": "azure",
+                        "provider": "google",
                         "count": "3"
                       },
                       {
-                        "provider": "docker",
+                        "provider": "aws",
                         "count": "2"
                       },
                       {
@@ -531,16 +543,12 @@
                     ],
                     "roles_breakdown": [
                       {
-                        "role": "developer",
+                        "role": "Mentor / Coach",
                         "count": "7"
                       },
                       {
-                        "role": "devops",
-                        "count": "4"
-                      },
-                      {
-                        "role": "architect",
-                        "count": "2"
+                        "role": "Mentee / Coachee",
+                        "count": "6"
                       },
                       {
                         "role": null,

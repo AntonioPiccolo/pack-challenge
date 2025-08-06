@@ -20,7 +20,6 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy source code  
 COPY . ./
 
-
 # Change ownership and switch to non-root user
 RUN chown -R nodeuser:nodejs /app
 USER nodeuser

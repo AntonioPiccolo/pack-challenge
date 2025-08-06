@@ -22,9 +22,8 @@ const getResource = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Resource not found' });
         }
 
-        // Serve file based on storage type
-        if (process.env.NODE_ENV === 'local') {
-            // In local environment, files are not stored
+        // In local environment, files are not stored
+        if (process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'test') {
             return res.status(200).json({
                 success: true,
                 message: 'Files are not stored in local development environment',
@@ -35,12 +34,10 @@ const getResource = async (req, res) => {
                 }
             });
         } else if (resource.s3_key) {
-            // Serve from S3 storage
             try {
                 const { downloadFileFromS3 } = require('../config/s3');
                 const fileData = await downloadFileFromS3(resource.s3_key);
                 
-                // Set appropriate headers for file download
                 res.set({
                     'Content-Type': resource.mime_type || fileData.contentType || 'application/octet-stream',
                     'Content-Length': resource.file_size || fileData.contentLength,
@@ -48,7 +45,6 @@ const getResource = async (req, res) => {
                     'Last-Modified': fileData.lastModified?.toUTCString()
                 });
 
-                // Pipe the S3 stream to response
                 fileData.stream.pipe(res);
             } catch (s3Error) {
                 console.error('Failed to download file from S3:', s3Error.message);
@@ -65,7 +61,6 @@ const getResource = async (req, res) => {
 
 const getResourceSummary = async (req, res) => {
     try {
-        // Get basic summary stats
         const summary = await db.selectFrom('resources')
             .select([
                 (eb) => eb.fn.count('id').as('total_resources'),
@@ -73,7 +68,6 @@ const getResourceSummary = async (req, res) => {
             ])
             .executeTakeFirst();
 
-        // Get categories breakdown
         const categoriesBreakdown = await db.selectFrom('resources')
             .select([
                 'category',
@@ -82,7 +76,6 @@ const getResourceSummary = async (req, res) => {
             .groupBy('category')
             .execute();
 
-        // Get languages breakdown
         const languagesBreakdown = await db.selectFrom('resources')
             .select([
                 'language',
@@ -91,7 +84,6 @@ const getResourceSummary = async (req, res) => {
             .groupBy('language')
             .execute();
 
-        // Get providers breakdown
         const providersBreakdown = await db.selectFrom('resources')
             .select([
                 'provider',
@@ -100,7 +92,6 @@ const getResourceSummary = async (req, res) => {
             .groupBy('provider')
             .execute();
 
-        // Get roles breakdown
         const rolesBreakdown = await db.selectFrom('resources')
             .select([
                 'role',
@@ -133,7 +124,6 @@ const uploadResource = async (req, res) => {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Extract validated data from middleware  
         const { title, description, category, language, provider, role } = req.validatedData;
         console.log('Validated data:', { title, description, category, language, provider, role });
         
@@ -141,7 +131,7 @@ const uploadResource = async (req, res) => {
         let s3Bucket = null;
         let filePath = null;
         
-        if (process.env.NODE_ENV !== 'local') {
+        if (process.env.NODE_ENV !== 'local' && process.env.NODE_ENV !== 'test') {
             // Upload to S3 only in non-local environments
             const { uploadFileToS3, generateS3Key } = require('../config/s3');
             s3Key = generateS3Key(req.file.originalname);
@@ -150,7 +140,7 @@ const uploadResource = async (req, res) => {
             filePath = s3Result.url;
         } else {
             // In local environment, files are not stored anywhere
-            filePath = 'local-development-no-storage';
+            filePath = 'no-storage';
         }
         
         // Insert resource into database
