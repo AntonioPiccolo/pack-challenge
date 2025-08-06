@@ -1,4 +1,4 @@
-# Pack Challenge - File Resource Management API
+# Pack Challenge
 
 Backend API for managing file uploads and providing data.
 
